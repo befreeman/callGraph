@@ -1,6 +1,6 @@
 current:
-	clang testXPath.c -I/usr/include/libxml2/ -lxml2
-	./a.out
+	clang++ testXPathModify.cpp -I/usr/include/libxml2/ -lxml2
+	./a.out xml.xml //src:function/src:name function2oiuh
 	rm -rf a.out
 
 default:
@@ -20,6 +20,11 @@ parserContect:
 
 xmlReadFile:
 	clang testXmlReadFile.c -I/usr/include/libxml2/ -lxml2
+	./a.out
+	rm -rf a.out
+
+xpath:
+	clang testXPath.c -I/usr/include/libxml2/ -lxml2
 	./a.out
 	rm -rf a.out
 
