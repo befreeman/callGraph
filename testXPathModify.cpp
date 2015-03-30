@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <cstdlib>
+#include <stdio.h>
 #include "callGraphUtils.cpp"
 //libxml2
 #include <libxml/tree.h>

@@ -7,7 +7,6 @@
 #include <libxml/xpath.h> 
 #include <libxml/xpathInternals.h>
 
-
 //int parseFile(const char *filename);
 //void usage(const char *name);
 

@@ -20,7 +20,7 @@ print_element_names(xmlNode * a_node) {
 				++count;
 				print_element_names(current_node -> children);
 				--count;
-			} else {
+			} else if (current_node -> type == XML_TEXT_NODE) {
 //				printf("%s",current_node->content);
 			}
 //			printf("\n");

@@ -1,6 +1,6 @@
 current:
-	clang++ testXPathModify.cpp -I/usr/include/libxml2/ -lxml2
-	./a.out xml.xml //src:function/src:name function2oiuh
+	clang++ CallGraph.cpp -I/usr/include/libxml2/ -lxml2
+	./a.out xml.xml 
 	rm -rf a.out
 
 default:
@@ -11,6 +11,17 @@ betterOutput:
 	clang testBetterOutput.c -I/usr/include/libxml2/ -lxml2
 	./a.out
 	rm -rf a.out
+
+callGraphOld:
+	clang++ callGraph.cpp -I/usr/include/libxml2/ -lxml2
+	./a.out xml.xml 
+	rm -rf a.out
+
+makeTree:
+	clang++ testMakeTree.cpp -I/usr/include/libxml2/ -lxml2
+	./a.out xml.xml //src:function/src:name function2oiuh
+	rm -rf a.out
+
 
 parserContect:
 	clang testParserContext.c -I/usr/include/libxml2/ -lxml2
@@ -31,6 +42,11 @@ xpath:
 xpathExpr:
 	clang testXPathExpr.c -I/usr/include/libxml2/ -lxml2
 	./a.out
+	rm -rf a.out
+
+xpathModify:
+	clang++ testXPathModify.cpp -I/usr/include/libxml2/ -lxml2
+	./a.out xml.xml //src:function/src:name function2oiuh
 	rm -rf a.out
 
 
