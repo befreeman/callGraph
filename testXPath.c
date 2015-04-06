@@ -25,11 +25,12 @@ int main () {
 	xmlXPathRegisterNs(xpathCtx, BAD_CAST "cpp", BAD_CAST "http://www.sdml.info/srcML/cpp");
 
 
-	xpathFunction = xmlXPathEvalExpression(BAD_CAST "//src:function",xpathCtx);
+
+	xpathFunction = xmlXPathEvalExpression(BAD_CAST "//src:function/src:name|//src:function/src:parameter_list",xpathCtx);
 	xpathCall = xmlXPathEvalExpression(BAD_CAST "//src:call",xpathCtx);
 
 	print(xpathFunction -> nodesetval, stdout);
-	print(xpathCall -> nodesetval, stdout);
+	//print(xpathCall -> nodesetval, stdout);
 
 	return 0;
 }
@@ -49,13 +50,12 @@ void print(xmlNodeSetPtr nodes, FILE* output) {
 		if (nodes -> nodeTab[i] -> type == XML_NAMESPACE_DECL) {
 			printf("XML_NAMESPACE_DECL\n");
 		} else if (nodes -> nodeTab[i] -> type == XML_ELEMENT_NODE) {
-			printf("XML_ELEMENT_NODE\n");
+			printf("XML_ELEMENT_NODE ");
 
 			current = nodes->nodeTab[i];   	    
 	    if(current->ns) { 
-    	        fprintf(output, "= element node \"%s:%s\"\n", 
-		    current->ns->href, current->name);
-							fprintf(output, "   node name: %s\n", current->name);
+    	        fprintf(output, ": %s | %s\n", current->name, current->children->content);
+							//fprintf(output, "   node name: %s\n", current->name);
 	    } else {
     	        fprintf(output, "= element node \"%s\"\n", 
 		    current->name);

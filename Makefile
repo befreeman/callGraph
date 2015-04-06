@@ -1,5 +1,5 @@
 current:
-	clang++ CallGraph.cpp -I/usr/include/libxml2/ -lxml2
+	clang++ Test2.cpp -I/usr/include/libxml2/ -lxml2
 	./a.out xml.xml 
 	rm -rf a.out
 
@@ -74,3 +74,4 @@ run: main
 # clean files
 clean:
 	rm -rf *.o *.out *.gch test xml
+	clear

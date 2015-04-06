@@ -7,8 +7,40 @@
 #include <libxml/xpath.h> 
 #include <libxml/xpathInternals.h>
 
-//int parseFile(const char *filename);
-//void usage(const char *name);
+void printSiblings(xmlNodePtr current);
+void printChildren(xmlNodePtr current);
+void update(xmlNodeSetPtr nodes, const xmlChar *value);
+int parseFile(xmlDocPtr& doc, const char *filename);
+int createXPathEvalContext(xmlXPathContextPtr& xpathCtx, xmlDocPtr& doc);
+void usage(const char *name);
+void addFunctionNodes(xmlNodeSetPtr nodes, xmlNodePtr root);
+void printInfo(xmlNodeSetPtr nodes, std::ostream& out);
+void print(xmlNodeSetPtr nodes, FILE* output);
+void createNodesFromXPath(xmlXPathObjectPtr xpath);
+
+void printSiblings(xmlNodePtr current) {
+	std::cout << "\n\n### - printSiblings - ###\n";
+	if (current) {
+		xmlNodePtr check = NULL;
+		check = current;
+		
+	} else {
+		std::cout << "no siblings \n";
+	}
+	std::cout << "\n\n";
+	//xmlNodePtr next = current -> next;
+}
+
+void printChildren(xmlNodePtr current) {
+	std::cout << "\n\n### - printChildren - ###\n";
+	if (current) {
+		xmlNodePtr temp = current;
+		while (temp != NULL) {
+			std::cout << temp -> name << " - ";
+			temp = temp -> children;
+		}
+	}
+}
 
 void update(xmlNodeSetPtr nodes, const xmlChar *value) {
 	int size;
@@ -45,6 +77,45 @@ void usage(const char *name) {
 	std::cerr << "Usage: " << name << " <xml-file> <xpath-expr> <value>\n";	
 }
 
+void addFunctionNodes(xmlNodeSetPtr nodes, xmlNodePtr root) {
+	std::cout << "### - in addFunctionNodes - ###\n";
+	
+
+	//if there are nodes, then get the number of nodes, else 0
+	int size = (nodes) ? nodes -> nodeNr : 0;
+
+	//out << "### - results - ###\n";
+	for (int i = 0; i < size; ++i) {
+		assert(nodes->nodeTab[i]);
+		xmlNodePtr current = nodes->nodeTab[i];
+		xmlNodePtr function = xmlNewNode(NULL, BAD_CAST "function");
+		xmlNodePtr fname = xmlNewChild(function, NULL, BAD_CAST current -> name,BAD_CAST current -> children -> content);
+		xmlAddChild(root, function);
+
+		current = current -> next;
+		std::cout << current -> name << "\n";
+	}
+}
+
+void printInfo(xmlNodeSetPtr nodes, std::ostream& out) {
+	assert(out);
+	xmlNodePtr current;
+	//if there are nodes, then get the number of nodes, else 0
+	int size = (nodes) ? nodes -> nodeNr : 0;
+
+	out << "### - results - ###\n";
+	for (int i = 0; i < size; ++i) {
+		assert(nodes->nodeTab[i]);
+		current = nodes->nodeTab[i];
+		out << current -> name << " : ";
+		if (current -> children -> content) { 
+			std::cout << current -> children -> content << "\n";
+		} else {
+			std::cout << " (null)\n";
+		}
+	}
+}
+
 void print(xmlNodeSetPtr nodes, FILE* output) {
 	xmlNodePtr current;
 	int size, i;
@@ -79,4 +150,11 @@ void print(xmlNodeSetPtr nodes, FILE* output) {
 	}
 }
 
-
+std::string getContent(xmlNodePtr node) {
+	xmlNodePtr current = node;
+	while (current -> children != NULL) {
+		current = current -> children;
+	}
+//	 s = current -> content;
+	return "s";
+}
