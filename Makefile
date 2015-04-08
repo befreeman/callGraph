@@ -1,4 +1,4 @@
-current:
+current: clear
 	clang++ Test2.cpp -I/usr/include/libxml2/ -lxml2
 	./a.out xml.xml 
 	rm -rf a.out
@@ -72,6 +72,10 @@ run: main
 	./test
 	make clean
 # clean files
+
+clear:
+	clear
+
 clean:
 	rm -rf *.o *.out *.gch test xml
 	clear

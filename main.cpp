@@ -5,10 +5,14 @@ void foo1();
 
 int main (int argc) 
 {
-	foo();
-	foo();
+	int i = 0;
+	double d = 0;
+	char c = 'a';
+
+	foo(i,c,d);
+	foo(i,c,d);
 	foo1();
-	foo();
+	foo(i,c,d);
 	foo1();
 	return 0;
 }

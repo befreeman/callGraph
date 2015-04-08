@@ -35,27 +35,22 @@ int main (int argc, char ** argv) {
 
 	xmlXPathObjectPtr test = xmlXPathEvalExpression(BAD_CAST "//src:function",docCtx);
 	xmlXPathObjectPtr functionNames = xmlXPathEvalExpression(BAD_CAST "//src:function/src:name",docCtx);
-	printInfo(functionNames -> nodesetval, std::cout);
 	xmlXPathObjectPtr test2 = xmlXPathEvalExpression(BAD_CAST "//src:function/src:parameter_list",testCtx);
-	printInfo(test2 -> nodesetval, std::cout);
 
 	for (int i = 0; i < test -> nodesetval -> nodeNr; ++i) {
 		xmlNodePtr current = test -> nodesetval -> nodeTab[i];
 		xmlNodePtr currentName = functionNames -> nodesetval -> nodeTab[i];
 
-
 		//add names
 		xmlNodePtr function = xmlNewNode(NULL, BAD_CAST "function");
 		if (currentName -> children -> content) {
-			xmlNodePtr functionName = xmlNewChild(function,NULL, BAD_CAST "name", current -> children -> content);
-
+			xmlNodePtr functionName = xmlNewChild(function,NULL, BAD_CAST "name", currentName -> children -> content);
 		}
 		
 		//run new XPath and get param list
 		xmlXPathSetContextNode(test -> nodesetval -> nodeTab[i],testCtx);
 		xmlXPathObjectPtr paramsXPath = xmlXPathEvalExpression(BAD_CAST "child::src:parameter_list/descendant::src:type/src:name",testCtx);
 		xmlNodePtr paramsNode = xmlNewNode(NULL, BAD_CAST "parameter_list");
-		printInfo(paramsXPath -> nodesetval, std::cout);
 		//add params to the function
 		if (paramsXPath -> nodesetval != NULL) {
 			for (int j = 0; j < paramsXPath -> nodesetval -> nodeNr; ++j) {
@@ -63,20 +58,38 @@ int main (int argc, char ** argv) {
 				if (current -> children -> content) {
 					xmlNodePtr paramName = xmlNewChild(paramsNode, NULL, BAD_CAST "type", current -> children -> content);
 				} else {
-					std::cout << "no content\n";
+					//do nothing
 				}
 			}
 		} else {
 			//do nothing
 		}
 
-		//add the function node at the end
+		//get the list of calls
+		xmlXPathObjectPtr callXPath = xmlXPathEvalExpression(BAD_CAST "child::src:block/descendant::src:call/src:name",testCtx);
+		xmlNodePtr callNode = xmlNewNode(NULL, BAD_CAST "calls");
+		//add the calls to the function
+		if (callXPath -> nodesetval != NULL) {
+			for (int j = 0; j < callXPath -> nodesetval -> nodeNr; ++j) {
+				xmlNodePtr current = callXPath -> nodesetval -> nodeTab[j];
+				if (current -> children -> content) {
+					xmlNodePtr callName = xmlNewChild(callNode, NULL, BAD_CAST "name", current -> children -> content);
+				} else {
+					std::cout << "no content\n";
+				}
+			}
+		} else {
+			//do nothing
+		}	
+
+		//add the function nodes at the end
 		xmlAddChild(function,paramsNode);
+		xmlAddChild(function,callNode);
 		xmlAddChild(rootNode,function);
 	}
 
 	xmlDocDump(stdout, callGraph);
-
+	xmlSaveFile("CALLGRAPH.xml",callGraph);
 	xmlFreeDoc(callGraph);
 	xmlCleanupParser();
 	xmlMemoryDump();

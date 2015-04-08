@@ -1,19 +1,162 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" language="C++" filename="main.cpp"><cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;iostream&gt;</cpp:file></cpp:include>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" language="C++" filename="callGraphUtils.cpp"><cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;iostream&gt;</cpp:file></cpp:include>
+<cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;cassert&gt;</cpp:file></cpp:include>
 
-<function_decl><type><name>void</name></type> <name>foo</name><parameter_list>(<param><decl><type><name>int</name></type></decl></param>,<param><decl><type><name>char</name></type></decl></param>,<param><decl><type><name>double</name></type></decl></param>)</parameter_list>;</function_decl>
-<function_decl><type><name>void</name></type> <name>foo1</name><parameter_list>()</parameter_list>;</function_decl>
+<comment type="line">//libxml2 libs</comment>
+<cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;libxml/tree.h&gt;</cpp:file></cpp:include> 
+<cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;libxml/parser.h&gt;</cpp:file></cpp:include> 
+<cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;libxml/xpath.h&gt;</cpp:file></cpp:include> 
+<cpp:include>#<cpp:directive>include</cpp:directive> <cpp:file>&lt;libxml/xpathInternals.h&gt;</cpp:file></cpp:include>
 
-<function><type><name>int</name></type> <name>main</name> <parameter_list>(<param><decl><type><name>int</name></type> <name>argc</name></decl></param>)</parameter_list> 
-<block>{
-	<expr_stmt><expr><call><name>foo</name><argument_list>()</argument_list></call></expr>;</expr_stmt>
-	<expr_stmt><expr><call><name>foo</name><argument_list>()</argument_list></call></expr>;</expr_stmt>
-	<expr_stmt><expr><call><name>foo1</name><argument_list>()</argument_list></call></expr>;</expr_stmt>
-	<expr_stmt><expr><call><name>foo</name><argument_list>()</argument_list></call></expr>;</expr_stmt>
-	<expr_stmt><expr><call><name>foo1</name><argument_list>()</argument_list></call></expr>;</expr_stmt>
+<function_decl><type><name>void</name></type> <name>printSiblings</name><parameter_list>(<param><decl><type><name>xmlNodePtr</name></type> <name>current</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>printChildren</name><parameter_list>(<param><decl><type><name>xmlNodePtr</name></type> <name>current</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>update</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><specifier>const</specifier> <name>xmlChar</name> <modifier>*</modifier></type><name>value</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>int</name></type> <name>parseFile</name><parameter_list>(<param><decl><type><name>xmlDocPtr</name><modifier>&amp;</modifier></type> <name>doc</name></decl></param>, <param><decl><type><specifier>const</specifier> <name>char</name> <modifier>*</modifier></type><name>filename</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>int</name></type> <name>createXPathEvalContext</name><parameter_list>(<param><decl><type><name>xmlXPathContextPtr</name><modifier>&amp;</modifier></type> <name>xpathCtx</name></decl></param>, <param><decl><type><name>xmlDocPtr</name><modifier>&amp;</modifier></type> <name>doc</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>usage</name><parameter_list>(<param><decl><type><specifier>const</specifier> <name>char</name> <modifier>*</modifier></type><name>name</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>addFunctionNodes</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><name>xmlNodePtr</name></type> <name>root</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>printInfo</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><name><name>std</name><operator>::</operator><name>ostream</name></name><modifier>&amp;</modifier></type> <name>out</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>print</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><name>FILE</name><modifier>*</modifier></type> <name>output</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name>void</name></type> <name>createNodesFromXPath</name><parameter_list>(<param><decl><type><name>xmlXPathObjectPtr</name></type> <name>xpath</name></decl></param>)</parameter_list>;</function_decl>
+
+<function><type><name>void</name></type> <name>printSiblings</name><parameter_list>(<param><decl><type><name>xmlNodePtr</name></type> <name>current</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <literal type="string">"\n\n### - printSiblings - ###\n"</literal></expr>;</expr_stmt>
+	<if>if <condition>(<expr><name>current</name></expr>)</condition><then> <block>{
+		<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>check</name> <init>= <expr><name>NULL</name></expr></init></decl>;</decl_stmt>
+		<expr_stmt><expr><name>check</name> <operator>=</operator> <name>current</name></expr>;</expr_stmt>
+		
+	}</block></then> <else>else <block>{
+		<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <literal type="string">"no siblings \n"</literal></expr>;</expr_stmt>
+	}</block></else></if>
+	<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <literal type="string">"\n\n"</literal></expr>;</expr_stmt>
+	<comment type="line">//xmlNodePtr next = current -&gt; next;</comment>
+}</block></function>
+
+<function><type><name>void</name></type> <name>printChildren</name><parameter_list>(<param><decl><type><name>xmlNodePtr</name></type> <name>current</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <literal type="string">"\n\n### - printChildren - ###\n"</literal></expr>;</expr_stmt>
+	<if>if <condition>(<expr><name>current</name></expr>)</condition><then> <block>{
+		<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>temp</name> <init>= <expr><name>current</name></expr></init></decl>;</decl_stmt>
+		<while>while <condition>(<expr><name>temp</name> <operator>!=</operator> <name>NULL</name></expr>)</condition> <block>{
+			<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <name><name>temp</name> <operator>-&gt;</operator> <name>name</name></name> <operator>&lt;&lt;</operator> <literal type="string">" - "</literal></expr>;</expr_stmt>
+			<expr_stmt><expr><name>temp</name> <operator>=</operator> <name><name>temp</name> <operator>-&gt;</operator> <name>children</name></name></expr>;</expr_stmt>
+		}</block></while>
+	}</block></then></if>
+}</block></function>
+
+<function><type><name>void</name></type> <name>update</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><specifier>const</specifier> <name>xmlChar</name> <modifier>*</modifier></type><name>value</name></decl></param>)</parameter_list> <block>{
+	<decl_stmt><decl><type><name>int</name></type> <name>size</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name>int</name></type> <name>i</name></decl>;</decl_stmt>
+
+	<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name>value</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name>size</name> <operator>=</operator> <operator>(</operator><name>nodes</name><operator>)</operator> <operator>?</operator> <name><name>nodes</name><operator>-&gt;</operator><name>nodeNr</name></name> <operator>:</operator> <literal type="number">0</literal></expr>;</expr_stmt>
+	<for>for <control>(<init><expr><name>i</name> <operator>=</operator> <name>size</name> <operator>-</operator> <literal type="number">1</literal></expr>;</init> <condition><expr><name>i</name> <operator>&gt;=</operator> <literal type="number">0</literal></expr>;</condition> <incr><expr><operator>--</operator><name>i</name></expr></incr>)</control> <block>{
+		<expr_stmt><expr><call><name>xmlNodeSetContent</name><argument_list>(<argument><expr><name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr></argument>, <argument><expr><name>value</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<if>if <condition>(<expr><name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name><operator>-&gt;</operator><name>type</name> <operator>!=</operator> <name>XML_NAMESPACE_DECL</name></expr>)</condition><then> <block>{
+			<expr_stmt><expr><name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name> <operator>=</operator> <name>NULL</name></expr>;</expr_stmt>
+		}</block></then></if>
+	}</block></for>
+}</block></function>
+
+<function><type><name>int</name></type> <name>parseFile</name><parameter_list>(<param><decl><type><name>xmlDocPtr</name><modifier>&amp;</modifier></type> <name>doc</name></decl></param>, <param><decl><type><specifier>const</specifier> <name>char</name> <modifier>*</modifier></type><name>filename</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><name>doc</name> <operator>=</operator> <call><name>xmlParseFile</name><argument_list>(<argument><expr><name>filename</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<if>if <condition>(<expr><name>doc</name> <operator>==</operator> <name>NULL</name></expr>)</condition><then> <block>{
+		<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cerr</name></name> <operator>&lt;&lt;</operator> <literal type="string">"Error: unable to parse file: "</literal> <operator>&lt;&lt;</operator> <name>filename</name> <operator>&lt;&lt;</operator> <literal type="string">"\n"</literal></expr>;</expr_stmt>
+		<return>return <expr><operator>-</operator><literal type="number">1</literal></expr>;</return>
+	}</block></then></if>
 	<return>return <expr><literal type="number">0</literal></expr>;</return>
 }</block></function>
 
-<function><type><name>void</name></type> <name>foo</name><parameter_list>(<param><decl><type><name>int</name></type> <name>i</name></decl></param>,<param><decl><type><name>char</name></type> <name>c</name></decl></param>, <param><decl><type><name>double</name></type> <name>d</name></decl></param>)</parameter_list> <block>{ <expr_stmt><expr><call><name>foo1</name><argument_list>()</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>foo1</name><argument_list>()</argument_list></call></expr>;</expr_stmt>}</block></function>
-<function><type><name>void</name></type> <name>foo1</name><parameter_list>()</parameter_list> <block>{}</block></function>
+<function><type><name>int</name></type> <name>createXPathEvalContext</name><parameter_list>(<param><decl><type><name>xmlXPathContextPtr</name><modifier>&amp;</modifier></type> <name>xpathCtx</name></decl></param>, <param><decl><type><name>xmlDocPtr</name><modifier>&amp;</modifier></type> <name>doc</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><name>xpathCtx</name> <operator>=</operator> <call><name>xmlXPathNewContext</name><argument_list>(<argument><expr><name>doc</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<if>if <condition>(<expr><literal type="number">1</literal></expr>)</condition><then> <block>{<empty_stmt>;</empty_stmt>}</block></then></if>
+	<return>return <expr><literal type="number">0</literal></expr>;</return>
+}</block></function>
+
+<comment type="block">/* print usage information */</comment>
+<function><type><name>void</name></type> <name>usage</name><parameter_list>(<param><decl><type><specifier>const</specifier> <name>char</name> <modifier>*</modifier></type><name>name</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name>name</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cerr</name></name> <operator>&lt;&lt;</operator> <literal type="string">"Usage: "</literal> <operator>&lt;&lt;</operator> <name>name</name> <operator>&lt;&lt;</operator> <literal type="string">" &lt;xml-file&gt; &lt;xpath-expr&gt; &lt;value&gt;\n"</literal></expr>;</expr_stmt>	
+}</block></function>
+
+<function><type><name>void</name></type> <name>addFunctionNodes</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><name>xmlNodePtr</name></type> <name>root</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <literal type="string">"### - in addFunctionNodes - ###\n"</literal></expr>;</expr_stmt>
+	
+
+	<comment type="line">//if there are nodes, then get the number of nodes, else 0</comment>
+	<decl_stmt><decl><type><name>int</name></type> <name>size</name> <init>= <expr><operator>(</operator><name>nodes</name><operator>)</operator> <operator>?</operator> <name><name>nodes</name> <operator>-&gt;</operator> <name>nodeNr</name></name> <operator>:</operator> <literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+
+	<comment type="line">//out &lt;&lt; "### - results - ###\n";</comment>
+	<for>for <control>(<init><decl><type><name>int</name></type> <name>i</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</init> <condition><expr><name>i</name> <operator>&lt;</operator> <name>size</name></expr>;</condition> <incr><expr><operator>++</operator><name>i</name></expr></incr>)</control> <block>{
+		<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>current</name> <init>= <expr><name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr></init></decl>;</decl_stmt>
+		<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>function</name> <init>= <expr><call><name>xmlNewNode</name><argument_list>(<argument><expr><name>NULL</name></expr></argument>, <argument><expr><name>BAD_CAST</name> <literal type="string">"function"</literal></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+		<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>fname</name> <init>= <macro><name>xmlNewChild</name><argument_list>(<argument>function</argument>, <argument>NULL</argument>, <argument>BAD_CAST current -&gt; name</argument>,<argument>BAD_CAST current -&gt; children -&gt; content</argument>)</argument_list></macro></init></decl>;</decl_stmt>
+		<expr_stmt><expr><call><name>xmlAddChild</name><argument_list>(<argument><expr><name>root</name></expr></argument>, <argument><expr><name>function</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+		<expr_stmt><expr><name>current</name> <operator>=</operator> <name><name>current</name> <operator>-&gt;</operator> <name>next</name></name></expr>;</expr_stmt>
+		<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <name><name>current</name> <operator>-&gt;</operator> <name>name</name></name> <operator>&lt;&lt;</operator> <literal type="string">"\n"</literal></expr>;</expr_stmt>
+	}</block></for>
+}</block></function>
+
+<function><type><name>void</name></type> <name>printInfo</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><name><name>std</name><operator>::</operator><name>ostream</name></name><modifier>&amp;</modifier></type> <name>out</name></decl></param>)</parameter_list> <block>{
+	<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name>out</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>current</name></decl>;</decl_stmt>
+	<comment type="line">//if there are nodes, then get the number of nodes, else 0</comment>
+	<decl_stmt><decl><type><name>int</name></type> <name>size</name> <init>= <expr><operator>(</operator><name>nodes</name><operator>)</operator> <operator>?</operator> <name><name>nodes</name> <operator>-&gt;</operator> <name>nodeNr</name></name> <operator>:</operator> <literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+
+	<expr_stmt><expr><name>out</name> <operator>&lt;&lt;</operator> <literal type="string">"### - results - ###\n"</literal></expr>;</expr_stmt>
+	<for>for <control>(<init><decl><type><name>int</name></type> <name>i</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</init> <condition><expr><name>i</name> <operator>&lt;</operator> <name>size</name></expr>;</condition> <incr><expr><operator>++</operator><name>i</name></expr></incr>)</control> <block>{
+		<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><name>current</name> <operator>=</operator> <name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr>;</expr_stmt>
+		<expr_stmt><expr><name>out</name> <operator>&lt;&lt;</operator> <name><name>current</name> <operator>-&gt;</operator> <name>name</name></name> <operator>&lt;&lt;</operator> <literal type="string">" : "</literal></expr>;</expr_stmt>
+		<if>if <condition>(<expr><name><name>current</name> <operator>-&gt;</operator> <name>children</name> <operator>-&gt;</operator> <name>content</name></name></expr>)</condition><then> <block>{ 
+			<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <name><name>current</name> <operator>-&gt;</operator> <name>children</name> <operator>-&gt;</operator> <name>content</name></name> <operator>&lt;&lt;</operator> <literal type="string">"\n"</literal></expr>;</expr_stmt>
+		}</block></then> <else>else <block>{
+			<expr_stmt><expr><name><name>std</name><operator>::</operator><name>cout</name></name> <operator>&lt;&lt;</operator> <literal type="string">" (null)\n"</literal></expr>;</expr_stmt>
+		}</block></else></if>
+	}</block></for>
+}</block></function>
+
+<function><type><name>void</name></type> <name>print</name><parameter_list>(<param><decl><type><name>xmlNodeSetPtr</name></type> <name>nodes</name></decl></param>, <param><decl><type><name>FILE</name><modifier>*</modifier></type> <name>output</name></decl></param>)</parameter_list> <block>{
+	<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>current</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name>int</name></type> <name>size</name></decl>, <decl><type ref="prev"/><name>i</name></decl>;</decl_stmt>
+
+	<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name>output</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name>size</name> <operator>=</operator> <operator>(</operator><name>nodes</name><operator>)</operator> <operator>?</operator> <name><name>nodes</name> <operator>-&gt;</operator> <name>nodeNr</name></name> <operator>:</operator> <literal type="number">0</literal></expr>;</expr_stmt>
+
+	<expr_stmt><expr><call><name>fprintf</name><argument_list>(<argument><expr><name>output</name></expr></argument>, <argument><expr><literal type="string">"Result (%d nodes):\n"</literal></expr></argument>,<argument><expr><name>size</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>	
+	<for>for <control>(<init><expr><name>i</name> <operator>=</operator> <literal type="number">0</literal></expr>;</init> <condition><expr><name>i</name> <operator>&lt;</operator> <name>size</name></expr>;</condition> <incr><expr><operator>++</operator><name>i</name></expr></incr>)</control> <block>{
+		<expr_stmt><expr><call><name>assert</name><argument_list>(<argument><expr><name><name>nodes</name> <operator>-&gt;</operator> <name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		
+		<if>if <condition>(<expr><name><name>nodes</name> <operator>-&gt;</operator> <name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name> <operator>-&gt;</operator> <name>type</name> <operator>==</operator> <name>XML_NAMESPACE_DECL</name></expr>)</condition><then> <block>{
+			<expr_stmt><expr><call><name>printf</name><argument_list>(<argument><expr><literal type="string">"XML_NAMESPACE_DECL\n"</literal></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		}</block></then> <elseif>else <if>if <condition>(<expr><name><name>nodes</name> <operator>-&gt;</operator> <name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name> <operator>-&gt;</operator> <name>type</name> <operator>==</operator> <name>XML_ELEMENT_NODE</name></expr>)</condition><then> <block>{
+			<expr_stmt><expr><call><name>printf</name><argument_list>(<argument><expr><literal type="string">"XML_ELEMENT_NODE\n"</literal></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+			<expr_stmt><expr><name>current</name> <operator>=</operator> <name><name>nodes</name><operator>-&gt;</operator><name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr>;</expr_stmt>   	    
+	    <if>if<condition>(<expr><name><name>current</name><operator>-&gt;</operator><name>ns</name></name></expr>)</condition><then> <block>{ 
+    	        <expr_stmt><expr><call><name>fprintf</name><argument_list>(<argument><expr><name>output</name></expr></argument>, <argument><expr><literal type="string">"= element node \"%s:%s\"\n"</literal></expr></argument>, 
+		    <argument><expr><name><name>current</name><operator>-&gt;</operator><name>ns</name><operator>-&gt;</operator><name>href</name></name></expr></argument>, <argument><expr><name><name>current</name><operator>-&gt;</operator><name>name</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+							<expr_stmt><expr><call><name>fprintf</name><argument_list>(<argument><expr><name>output</name></expr></argument>, <argument><expr><literal type="string">"   node name: %s\n"</literal></expr></argument>, <argument><expr><name><name>current</name><operator>-&gt;</operator><name>name</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	    }</block></then> <else>else <block>{
+    	        <expr_stmt><expr><call><name>fprintf</name><argument_list>(<argument><expr><name>output</name></expr></argument>, <argument><expr><literal type="string">"= element node \"%s\"\n"</literal></expr></argument>, 
+		    <argument><expr><name><name>current</name><operator>-&gt;</operator><name>name</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	    }</block></else></if>
+
+
+		}</block></then></if></elseif> <else>else <block>{
+			<expr_stmt><expr><name>current</name> <operator>=</operator> <name><name>nodes</name> <operator>-&gt;</operator> <name>nodeTab</name><index>[<expr><name>i</name></expr>]</index></name></expr>;</expr_stmt>
+			<expr_stmt><expr><call><name>fprintf</name><argument_list>(<argument><expr><name>output</name></expr></argument>, <argument><expr><literal type="string">"=node \"%s\": type %d\n"</literal></expr></argument>, <argument><expr><name><name>current</name> <operator>-&gt;</operator> <name>name</name></name></expr></argument>, <argument><expr><name><name>current</name> <operator>-&gt;</operator> <name>type</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		}</block></else></if>
+	}</block></for>
+}</block></function>
+
+<function><type><name><name>std</name><operator>::</operator><name>string</name></name></type> <name>getContent</name><parameter_list>(<param><decl><type><name>xmlNodePtr</name></type> <name>node</name></decl></param>)</parameter_list> <block>{
+	<decl_stmt><decl><type><name>xmlNodePtr</name></type> <name>current</name> <init>= <expr><name>node</name></expr></init></decl>;</decl_stmt>
+	<while>while <condition>(<expr><name><name>current</name> <operator>-&gt;</operator> <name>children</name></name> <operator>!=</operator> <name>NULL</name></expr>)</condition> <block>{
+		<expr_stmt><expr><name>current</name> <operator>=</operator> <name><name>current</name> <operator>-&gt;</operator> <name>children</name></name></expr>;</expr_stmt>
+	}</block></while>
+<comment type="line">//	 s = current -&gt; content;</comment>
+	<return>return <expr><literal type="string">"s"</literal></expr>;</return>
+}</block></function>
 </unit>
