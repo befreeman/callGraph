@@ -1,5 +1,5 @@
 current: clear
-	clang++ Test2.cpp -I/usr/include/libxml2/ -lxml2
+	clang++ callGraph.cpp -I/usr/include/libxml2/ -lxml2
 	./a.out xml.xml 
 	rm -rf a.out
 
