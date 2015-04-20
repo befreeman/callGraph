@@ -1,21 +1,32 @@
 #include <iostream>
 
-void foo(int,char,double);
-void foo1();
+class test {
+public:
+	void test1() {};
+	void test2();
+	void test3(int i) {};
+	void test4(int i);
+};
 
-int main (int argc) 
+void test::test2() {};
+void test::test4(int i) {};
+
+void main1(int,char,double);
+void main2();
+
+int main (int argc, char ** argv) 
 {
 	int i = 0;
 	double d = 0;
 	char c = 'a';
 
-	foo(i,c,d);
-	foo(i,c,d);
-	foo1();
-	foo(i,c,d);
-	foo1();
+	main1(i,c,d);
+	main1(i,c,d);
+	main2();
+	main1(i,c,d);
+	main2();
 	return 0;
 }
 
-void foo(int i,char c, double d) { foo1(); foo1();}
-void foo1() {}
+void main1(int i,char c, double d) { main2(); main2();}
+void main2() {}

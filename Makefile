@@ -1,7 +1,13 @@
-current: clear
+current: clear xml
 	clang++ callGraph.cpp -I/usr/include/libxml2/ -lxml2
-	./a.out xml.xml 
-	rm -rf a.out
+	./a.out xml.xml CALLGRAPH.xml
+	xmllint --format CALLGRAPH.xml > prettyCG.xml
+
+prettify: clear
+	clang++ prettify.cpp -I/usr/include/libxml2/ -lxml2 -o prettify
+	./prettify CALLGRAPH.xml prettyGraph.xml
+	rm -rf prettify
+	
 
 default:
 	@echo 'make will run the following targets'
@@ -63,9 +69,9 @@ main: main.o func.o
 	clang++ main.o func.o -o test
 
 # create srcML files
-srcml:
+xml:
 	make clean
-	./srcml main.cpp -o xml
+	srcml main.cpp -o xml.xml
 
 # run everything and clean
 run: main 
@@ -73,9 +79,10 @@ run: main
 	make clean
 # clean files
 
+
 clear:
 	clear
 
 clean:
-	rm -rf *.o *.out *.gch test xml
+	rm -rf *.o *.out *.gch test xml a.out xml.xml *.o
 	clear

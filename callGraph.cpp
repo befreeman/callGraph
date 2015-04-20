@@ -1,6 +1,5 @@
 #include <iostream>
 #include <stdio.h>
-#include "callGraphUtils.cpp"
 
 //libxml libs
 #include <libxml/tree.h>
@@ -10,18 +9,19 @@
 
 int main (int argc, char ** argv) {
 
-	if (argc != 2) {exit(1);}
-
 	//set up documents
 	xmlDocPtr doc, callGraph;
 	doc = xmlParseFile(argv[1]);
+	//exit if doc is null
+	if (doc == NULL) { std::cout << "could not open file\n"; return (1); }
+
+	//setup the source document 
 	callGraph = xmlCopyDoc(doc, 0);
 	xmlXPathContextPtr docCtx = xmlXPathNewContext(doc);
 
 	//set root node of the call graph
 	xmlNodePtr rootNode = xmlNewNode(NULL, BAD_CAST "callGraph");
 	xmlDocSetRootElement(callGraph, rootNode);
-
 	
 	//set namespaces for XPath expressions
 	xmlXPathRegisterNs(docCtx, BAD_CAST "src", BAD_CAST "http://www.sdml.info/srcML/src");
@@ -33,22 +33,33 @@ int main (int argc, char ** argv) {
 	xmlXPathRegisterNs(testCtx, BAD_CAST "src", BAD_CAST "http://www.sdml.info/srcML/src");
  	xmlXPathRegisterNs(testCtx, BAD_CAST "cpp", BAD_CAST "http://www.sdml.info/srcML/cpp");
 
-	xmlXPathObjectPtr test = xmlXPathEvalExpression(BAD_CAST "//src:function",docCtx);
+	//get initial list of functions
+	xmlXPathObjectPtr functions = xmlXPathEvalExpression(BAD_CAST "//src:function",docCtx);
+
+	//get the corresponding list of names and parameters
 	xmlXPathObjectPtr functionNames = xmlXPathEvalExpression(BAD_CAST "//src:function/src:name",docCtx);
 	xmlXPathObjectPtr test2 = xmlXPathEvalExpression(BAD_CAST "//src:function/src:parameter_list",testCtx);
 
-	for (int i = 0; i < test -> nodesetval -> nodeNr; ++i) {
-		xmlNodePtr current = test -> nodesetval -> nodeTab[i];
-		xmlNodePtr currentName = functionNames -> nodesetval -> nodeTab[i];
+	//go through each function and get the name, param list, etc
+	for (int i = 0; i < functions -> nodesetval -> nodeNr; ++i) {
 
+		//get the current function
+		xmlNodePtr current = functions -> nodesetval -> nodeTab[i];
+		xmlNodePtr currentName = functionNames -> nodesetval -> nodeTab[i];
+	
 		//add names
 		xmlNodePtr function = xmlNewNode(NULL, BAD_CAST "function");
 		if (currentName -> children -> content) {
 			xmlNodePtr functionName = xmlNewChild(function,NULL, BAD_CAST "name", currentName -> children -> content);
+		} else if (currentName -> children -> children -> content) {
+			//probably a namespace, try to get it
+			xmlChar * namePlaceholder = xmlStrcat(currentName -> children -> children -> content,currentName -> children -> next -> children -> content);
+			namePlaceholder = xmlStrcat (namePlaceholder, currentName -> children -> next -> next -> children -> content);
+			std::cout << namePlaceholder << "\n"; 
+			xmlNodePtr functionName = xmlNewChild(function, NULL, BAD_CAST "name", namePlaceholder); 
 		}
-		
 		//run new XPath and get param list
-		xmlXPathSetContextNode(test -> nodesetval -> nodeTab[i],testCtx);
+		xmlXPathSetContextNode(functions -> nodesetval -> nodeTab[i],testCtx);
 		xmlXPathObjectPtr paramsXPath = xmlXPathEvalExpression(BAD_CAST "child::src:parameter_list/descendant::src:type/src:name",testCtx);
 		xmlNodePtr paramsNode = xmlNewNode(NULL, BAD_CAST "parameter_list");
 		//add params to the function
@@ -78,18 +89,23 @@ int main (int argc, char ** argv) {
 					std::cout << "no content\n";
 				}
 			}
-		} else {
-			//do nothing
 		}	
-
+	
 		//add the function nodes at the end
 		xmlAddChild(function,paramsNode);
 		xmlAddChild(function,callNode);
 		xmlAddChild(rootNode,function);
 	}
+	
 
-	xmlDocDump(stdout, callGraph);
-	xmlSaveFile("CALLGRAPH.xml",callGraph);
+	if (argc > 2) {
+		if (xmlSaveFile(argv[2],callGraph) == -1) {
+			std::cout << "could not save to the specified file name\n";
+			return (-1);
+		}
+	} else {
+		xmlDocDump(stdout, callGraph);
+	}
 	xmlFreeDoc(callGraph);
 	xmlCleanupParser();
 	xmlMemoryDump();
