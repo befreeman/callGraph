@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdio.h>
-
+#include <sstream>
 //libxml libs
 #include <libxml/tree.h>
 #include <libxml/parser.h>
@@ -47,8 +47,15 @@ int main (int argc, char ** argv) {
 		xmlNodePtr current = functions -> nodesetval -> nodeTab[i];
 		xmlNodePtr currentName = functionNames -> nodesetval -> nodeTab[i];
 	
-		//add names
 		xmlNodePtr function = xmlNewNode(NULL, BAD_CAST "function");
+		
+		//get the line number (and convert from long to c-str)
+		std::stringstream ss;
+		ss << xmlGetLineNo(current);
+		std::string s = ss.str();
+		xmlNewProp(function, BAD_CAST "line_number", BAD_CAST s.c_str() );
+		
+		//add the name of the function
 		if (currentName -> children -> content) {
 			xmlNodePtr functionName = xmlNewChild(function,NULL, BAD_CAST "name", currentName -> children -> content);
 		} else if (currentName -> children -> children -> content) {
