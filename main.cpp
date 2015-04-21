@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 class test {
 public:
@@ -19,6 +20,10 @@ int main (int argc, char ** argv)
 	int i = 0;
 	double d = 0;
 	char c = 'a';
+
+	std::cout << "test\n";
+	int a=1,b=2;
+	std::swap(a,b);
 
 	main1(i,c,d);
 	main1(i,c,d);
