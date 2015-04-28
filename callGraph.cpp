@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <sstream>
+#include <string>
 //libxml libs
 #include <libxml/tree.h>
 #include <libxml/parser.h>
@@ -13,7 +14,85 @@
  * -get the line number as attribute for functions and calls
  * -get the return type for calls
  * -get the # of params as attribute
- */
+ *
+
+void form_simple_xpath(xmlTextWriterPtr bufwriter, xmlNodePtr root_result_node) {
+
+        if ((!root_result_node) || (root_result_node->type != XML_ELEMENT_NODE) || (!root_result_node->name) || (strcmp((const char*) root_result_node->name, "unit") == 0)) {
+            return;
+        }
+
+        form_simple_xpath(bufwriter, root_result_node->parent);
+
+        xmlTextWriterWriteFormatString(bufwriter, "/%s:%s[%d]",
+                                       ((root_result_node->ns && root_result_node->ns->prefix) ? (const char*) root_result_node->ns->prefix : "src"),
+                                       root_result_node->name,
+                                       child_offset(root_result_node)
+                                       );
+}
+
+/**
+ * child_offset
+ * @param root_result_node the root node form xpath query result
+ *
+ * Find the child offset.
+ * @returns the child offset number as a string.
+ *
+int child_offset(xmlNodePtr root_result_node) {
+
+    int child_count = 1;
+    for(xmlNodePtr sibling_node = root_result_node->prev; sibling_node; sibling_node = sibling_node->prev) {
+
+        if (sibling_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if ((strcmp((const char*) root_result_node->name, (const char*) sibling_node->name) == 0) &&
+            ((root_result_node->ns == NULL && sibling_node->ns == NULL) || (root_result_node->ns->prefix == sibling_node->ns->prefix))) {
+            ++child_count;
+         }
+    }
+    return child_count;
+}
+*/
+
+std::string child_offset(xmlNodePtr node) {
+    int child_count = 1;
+    for (xmlNodePtr sibling = node -> prev; sibling; sibling = sibling -> prev) {
+        if (sibling -> type != XML_ELEMENT_NODE) {continue;}
+        if ((xmlStrEqual(node -> name, sibling -> name) == 0) && ((node -> ns == NULL && sibling -> ns == NULL) || (node -> ns -> prefix == sibling -> ns -> prefix))) {
+            ++child_count;
+        }
+    }
+    return std::to_string(child_count);
+}
+
+std::string getXPath(xmlNodePtr node) {
+    if ( (!node) || (node -> type != XML_ELEMENT_NODE) ) { return "no_path";}
+    xmlNodePtr tmp = node;
+    xmlChar * unit = xmlCharStrdup("unit");
+    std::string result = "";
+
+    while (xmlStrEqual(tmp -> name, unit) == 0) {
+        std::string s = (char *) tmp->name;
+        std::string offset = child_offset(tmp);
+        result = "/src:" + s + "[" + offset + "]" + result;
+        tmp = tmp -> parent;
+    }
+
+    std::string s = (char *) tmp -> name;
+
+    result = "src:" + s + result;
+
+    xmlAttr* attrTmp = tmp -> properties;
+    while (xmlStrEqual(attrTmp -> name, xmlCharStrdup("filename")) == 0) {
+        attrTmp = attrTmp -> next;
+    }
+
+    std::string filename = (char *) attrTmp -> children -> content; 
+
+    result = "@" + filename + "::" + result;
+    return result;
+}
 
 //get the line number and convert it to a string
 std::string getLineNumber(xmlNodePtr node) {
@@ -85,6 +164,10 @@ int main (int argc, char ** argv) {
         xmlNodePtr current = functions -> nodesetval -> nodeTab[i];
         xmlNodePtr currentName = functionNames -> nodesetval -> nodeTab[i];
         xmlNodePtr function = xmlNewNode(NULL, BAD_CAST "function");
+
+        //get XPath
+        std::string XPath = getXPath(current);
+        xmlNewChild(function, NULL, BAD_CAST "xpath", BAD_CAST XPath.c_str());
         
         //get the line number
         std::string lineNumber = getLineNumber(current);
