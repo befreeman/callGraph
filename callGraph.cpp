@@ -59,7 +59,8 @@ std::string child_offset(xmlNodePtr node) {
     int child_count = 1;
     for (xmlNodePtr sibling = node -> prev; sibling; sibling = sibling -> prev) {
         if (sibling -> type != XML_ELEMENT_NODE) {continue;}
-        if ((xmlStrEqual(node -> name, sibling -> name) == 0) && ((node -> ns == NULL && sibling -> ns == NULL) || (node -> ns -> prefix == sibling -> ns -> prefix))) {
+        if ((xmlStrEqual(node -> name, sibling -> name) == 0) && 
+            ((node -> ns == NULL && sibling -> ns == NULL) || (node -> ns -> prefix == sibling -> ns -> prefix))) {
             ++child_count;
         }
     }
@@ -81,7 +82,7 @@ std::string getXPath(xmlNodePtr node) {
 
     std::string s = (char *) tmp -> name;
 
-    result = "src:" + s + result;
+
 
     xmlAttr* attrTmp = tmp -> properties;
     while (xmlStrEqual(attrTmp -> name, xmlCharStrdup("filename")) == 0) {
@@ -90,7 +91,12 @@ std::string getXPath(xmlNodePtr node) {
 
     std::string filename = (char *) attrTmp -> children -> content; 
 
-    result = "@" + filename + "::" + result;
+//    result = "@" + filename + "::" + result;
+
+
+    //[@filename='@main.cpp']
+
+    result = "src:" + s + "[@filename=\'@" + filename + "\']" +  result;
     return result;
 }
 
